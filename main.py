@@ -10,16 +10,19 @@ from bs4 import BeautifulSoup
 class Crawler:
     def __init__(self):
         self.bot = TelegramBot()
-        self.__url = ''
+        self.__url = '0xc6a2ad8cc6e4a7e08fc37cc5954be07d499e7654'
+        self.target_url = []
         chromedriver_autoinstaller.install()
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('headless')
         self.options.add_argument('--no-sandbox')
         self.options.add_argument('--disable-dev-shm-usage')
+
         self.driver = webdriver.Chrome(options=self.options)
 
     def set_target_contract_url(self, _contract_url):
-        self.__url = _contract_url
+        self.target_url.append(_contract_url)
+
 
     def set_target_amount(self, _alert_amount):
         self.__alert_amount = _alert_amount
@@ -30,9 +33,9 @@ class Crawler:
         try:
             while True:
                 error_count = 0
-
                 block_num_list = []
                 self.driver.get(f'https://www.klaytnfinder.io/account/{self.__url}?tabId=tokenTransfer')
+                print(f'https://www.klaytnfinder.io/account/{self.__url}?tabId=tokenTransfer')
                 time.sleep(1)
                 soup = BeautifulSoup(self.driver.page_source, 'html5lib')
                 rows = soup.select('div.sc-bczRLJ.sc-gsnTZi.sc-jTYCaT.jJsXzF.fkYrgn.kbuOWw')
@@ -41,18 +44,19 @@ class Crawler:
                     block_info = {}
                     block_num = cols[3].text.replace('#','')
                     amount = cols[-1].text
+                    block_info['from'] = row.select('div > a')[1].attrs['href']
                     block_info['block_num'] = float(block_num)
                     block_info['amount'] = float(amount.replace(',',''))
                     block_num_list.append(block_info)
 
                 for block_info in block_num_list:
-
-                    if block_info['block_num'] > float(lastet_block_num):
-                        if block_info['amount'] > self.__alert_amount:
-                            self.bot.send(f'''[Klaytn swap]
-block-num : {block_info['block_num']} 
-amount : {block_info['amount']}
-''')
+                    for target_url in self.target_url:
+                        if block_info['block_num'] > float(lastet_block_num):
+                            if block_info['amount'] > self.__alert_amount and target_url in block_info['from']:
+                                self.bot.send(f'''[Klaytn swap]
+    block-num : {block_info['block_num']} 
+    amount : {block_info['amount']}
+    ''')
                         lastet_block_num = block_info['block_num']
 
                 lastet_block_num = block_num_list[0]['block_num']
@@ -90,7 +94,11 @@ class TelegramBot:
 
 cr = Crawler()
 # 대상 url 지정
-cr.set_target_contract_url('0xc6a2ad8cc6e4a7e08fc37cc5954be07d499e7654')
+cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
+cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
+cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
+cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
+cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
 # amount 지정
 cr.set_target_amount(50)
 cr.run()
