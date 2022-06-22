@@ -28,44 +28,36 @@ class Crawler:
     def run(self):
         self.bot.send('Klaytn finder 감시프로그램을 시작합니다.')
         lastet_block_num = '93995973'
-        try:
-            while True:
-                error_count = 0
-                block_num_list = []
-                self.driver.get(f'https://www.klaytnfinder.io/account/{self.__url}?tabId=tokenTransfer')
-                print(f'https://www.klaytnfinder.io/account/{self.__url}?tabId=tokenTransfer')
-                time.sleep(1)
-                soup = BeautifulSoup(self.driver.page_source, 'html5lib')
-                rows = soup.select('div.sc-bczRLJ.sc-gsnTZi.sc-jTYCaT.jJsXzF.fkYrgn.kbuOWw')
-                for row in rows:
-                    cols = row.select('div')
-                    block_info = {}
-                    block_num = cols[3].text.replace('#','')
-                    amount = cols[-1].text
-                    block_info['from'] = row.select('div > a')[1].attrs['href']
-                    block_info['block_num'] = float(block_num)
-                    block_info['amount'] = float(amount.replace(',',''))
-                    block_num_list.append(block_info)
+        while True:
+            error_count = 0
+            block_num_list = []
+            self.driver.get(f'https://www.klaytnfinder.io/account/{self.__url}?tabId=tokenTransfer')
+            time.sleep(1)
+            soup = BeautifulSoup(self.driver.page_source, 'html5lib')
+            rows = soup.select('div.sc-bczRLJ.sc-gsnTZi.sc-jTYCaT.jJsXzF.fkYrgn.kbuOWw')
+            for row in rows:
+                cols = row.select('div')
+                block_info = {}
+                block_num = cols[3].text.replace('#','')
+                amount = cols[-1].text
+                block_info['from'] = row.select('div > a')[1].attrs['href']
+                block_info['block_num'] = float(block_num)
+                block_info['amount'] = float(amount.replace(',',''))
+                block_num_list.append(block_info)
 
-                for block_info in block_num_list:
-                    for target_info in self.target_infos:
-                        if block_info['block_num'] > float(lastet_block_num):
-                            if block_info['amount'] > target_info['amount'] and target_info['url'] in block_info['from']:
-                                self.bot.send(f'''[Klaytn swap]
-    target_url : {target_info['url']} 
-    amount : {block_info['amount']}
-    ''')
-                        lastet_block_num = block_info['block_num']
+            for block_info in block_num_list:
+                for target_info in self.target_infos:
+                    if block_info['block_num'] > float(lastet_block_num):
+                        if block_info['amount'] > target_info['amount'] and target_info['url'] in block_info['from']:
+                        # if block_info['amount'] > target_info['amount'] :
+                            self.bot.send(f'''[Klaytn swap]
+target_url : {target_info['url']} 
+amount : {block_info['amount']}
+''')
+                    lastet_block_num = block_info['block_num']
 
-                lastet_block_num = block_num_list[0]['block_num']
-        except Exception as e:
-            error_count += 1
-            print(e)
-            self.bot.send(f'Klaytn 데이터 요청에 문제가 {error_count}번 발생했습니다.')
-            if error_count == 3:
-                error_count = 0
-                self.bot.send(f'Klaytn 데이터 요청에 문제가 있어서 5초 대기합니다.')
-                time.sleep(5)
+            lastet_block_num = block_num_list[0]['block_num']
+
 class TelegramBot:
     def __init__(self, parent=None):
         self.parent = parent
@@ -92,10 +84,8 @@ class TelegramBot:
 
 cr = Crawler()
 # 대상 url 지정
-cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
-cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
-cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
-cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
-cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount=100)
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount=100)
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount=100)
 
 cr.run()
