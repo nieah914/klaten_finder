@@ -11,7 +11,7 @@ class Crawler:
     def __init__(self):
         self.bot = TelegramBot()
         self.__url = '0xc6a2ad8cc6e4a7e08fc37cc5954be07d499e7654'
-        self.target_url = []
+        self.target_infos = []
         chromedriver_autoinstaller.install()
         self.options = webdriver.ChromeOptions()
         self.options.add_argument('headless')
@@ -20,12 +20,10 @@ class Crawler:
 
         self.driver = webdriver.Chrome(options=self.options)
 
-    def set_target_contract_url(self, _contract_url):
-        self.target_url.append(_contract_url)
+    def set_target_contract_url(self, _contract_url, _amount):
+        info = {'url':_contract_url, 'amount':_amount}
+        self.target_infos.append(info)
 
-
-    def set_target_amount(self, _alert_amount):
-        self.__alert_amount = _alert_amount
 
     def run(self):
         self.bot.send('Klaytn finder 감시프로그램을 시작합니다.')
@@ -50,11 +48,11 @@ class Crawler:
                     block_num_list.append(block_info)
 
                 for block_info in block_num_list:
-                    for target_url in self.target_url:
+                    for target_info in self.target_infos:
                         if block_info['block_num'] > float(lastet_block_num):
-                            if block_info['amount'] > self.__alert_amount and target_url in block_info['from']:
+                            if block_info['amount'] > target_info['amount'] and target_info['url'] in block_info['from']:
                                 self.bot.send(f'''[Klaytn swap]
-    block-num : {block_info['block_num']} 
+    target_url : {target_info['url']} 
     amount : {block_info['amount']}
     ''')
                         lastet_block_num = block_info['block_num']
@@ -94,11 +92,10 @@ class TelegramBot:
 
 cr = Crawler()
 # 대상 url 지정
-cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
-cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
-cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
-cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
-cr.set_target_contract_url('0x6456acb56f9eeedb976d5d72b60fb31720155b75')
-# amount 지정
-cr.set_target_amount(50)
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
+cr.set_target_contract_url(_contract_url='0x6456acb56f9eeedb976d5d72b60fb31720155b75',_amount='100')
+
 cr.run()
