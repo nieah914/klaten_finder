@@ -56,8 +56,8 @@ class Crawler:
                         # 비교할 항목들
                         for target_info in self.target_infos:
                             # 현재 블록 의 양이 목표치 양보다 큰지, 그리고 우리가 원하는 url 인지
-                            # if block_info['amount'] > target_info['amount'] and target_info['url'] in block_info['from']:
-                            if block_info['amount'] > target_info['amount'] :
+                            if block_info['amount'] > target_info['amount'] and target_info['url'] in block_info['from']:
+                            # if block_info['amount'] > target_info['amount'] :
                                 cur_time = datetime.datetime.now()
                                 ampm = cur_time.strftime('%p')
                                 ampm_kr = '오전' if ampm == 'AM' else '오후'
