@@ -18,8 +18,7 @@ class Crawler:
         # self.options.add_argument('headless')
         self.options.add_argument('--no-sandbox')
         self.options.add_argument('--disable-dev-shm-usage')
-
-        self.driver = webdriver.Chrome(options=self.options)
+        self.driver = webdriver.Chrome(executable_path='./chromedriver.exe',options=self.options)
 
     def set_target_contract_url(self,_token_name, _term , _contract_url, _amount):
         info = {'token_name':_token_name,'url':_contract_url, 'amount':_amount, 'term':_term}
@@ -69,12 +68,13 @@ class Crawler:
             except Exception as e:
                 lastet_block_num = '93995973'
                 error_count += 1
-                print(e)
-                self.bot.send(f'Klaytn finder 데이터 요청에 문제가 {error_count}번 발생했습니다.')
-                if error_count == 3:
-                    error_count = 0
-                    self.bot.send(f'Klaytn finder 데이터 요청에 문제가 있어서 5초 대기합니다.')
-                    time.sleep(5)
+                # print(e)
+                pass
+                # self.bot.send(f'Klaytn finder 데이터 요청에 문제가 {error_count}번 발생했습니다.')
+                # if error_count == 3:
+                #     error_count = 0
+                #     self.bot.send(f'Klaytn finder 데이터 요청에 문제가 있어서 5초 대기합니다.')
+                #     time.sleep(5)
 
 class TelegramBot:
     def __init__(self, parent=None):
@@ -102,6 +102,6 @@ class TelegramBot:
 
 cr = Crawler()
 # 대상 url 지정
-cr.set_target_contract_url(_token_name ='SIX',_term='가', _contract_url='0xbfb4528b7096d983f1c3c693274c4c14887aee41',_amount=100)
+cr.set_target_contract_url(_token_name ='SIX',_term='가', _contract_url='0xbfb4528b7096d983f1c3c693274c4c14887aee41',_amount=10)
 
 cr.run()
