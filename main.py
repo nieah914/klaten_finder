@@ -6,7 +6,8 @@ import telegram
 import chromedriver_autoinstaller
 from selenium import webdriver
 from bs4 import BeautifulSoup
-
+from selenium.webdriver.chrome.service import Service
+# from webdriver_manager.chrome import ChromeDriverManager
 
 class Crawler:
     def __init__(self):
@@ -18,7 +19,8 @@ class Crawler:
         # self.options.add_argument('headless')
         self.options.add_argument('--no-sandbox')
         self.options.add_argument('--disable-dev-shm-usage')
-        self.driver = webdriver.Chrome(executable_path='./chromedriver.exe',options=self.options)
+        self.driver = webdriver.Chrome('chromedriver.exe', options=self.options)
+        # self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
 
     def set_target_contract_url(self,_token_name, _term , _contract_url, _amount):
         info = {'token_name':_token_name,'url':_contract_url, 'amount':_amount, 'term':_term}
